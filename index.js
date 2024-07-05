@@ -10,17 +10,27 @@ const weatherApiKey = process.env.WEATHER_API_KEY;
 
 // Use request-ip middleware to get the client's IP address
 app.use(requestIp.mw());
+app.get('/', (req, res) =>{
+  res.send("Hello World");
+})
+
 
 app.get('/api/hello', async (req, res) => {
 
     const visitor_Name = req.query.visitor_name;
-    const client_Ip = req.clientIp;
+
+    //Fetch client IP address.
+    const client_Ip = 
+      req.headers['cf-connecting-ip'] ||
+      req.headers['x-real-ip'] ||
+      req.headers['x-forwarded-for'] ||
+      req.socket.remoteAddress || '';
 
     try {
         
         // Fetch Client's geolocation data/information
         const geoLocation = await axios.get(`http://ip-api.com/json/${client_Ip}`);
-        const city = geoLocation.data;
+        const city = geoLocation.data.city;
         console.log(city);
 
         // Fetch Client's weather data/information
